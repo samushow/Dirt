@@ -1,0 +1,40 @@
+name: Build DirtRush APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il progetto
+        uses: actions/checkout@v4
+
+      - name: Prepara Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Rendi eseguibile Gradle
+        run: chmod +x gradlew || true
+
+      - name: Compila APK
+        run: |
+          if [ -f gradlew ]; then
+            ./gradlew assembleDebug
+          else
+            gradle assembleDebug
+          fi
+
+      - name: Salva APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DirtRush-APK
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
