@@ -16,6 +16,7 @@ jobs:
         run: |
           unzip -o DirtRush.zip -d .
           ls -la
+          ls -la DirtRush/
 
       - name: Prepara Java
         uses: actions/setup-java@v4
@@ -26,22 +27,16 @@ jobs:
       - name: Prepara Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Rendi eseguibile Gradle
-        run: chmod +x gradlew || true
-
-      - name: Compila APK
+      - name: Genera gradlew e compila
+        working-directory: DirtRush
         run: |
-          if [ -f gradlew ]; then
-            ./gradlew assembleDebug
-          else
-            gradle assembleDebug
-          fi
+          gradle wrapper
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
 
       - name: Salva APK
         uses: actions/upload-artifact@v4
         with:
           name: DirtRush-APK
-          path: |
-            **/app/build/outputs/apk/debug/*.apk
-            **/build/outputs/apk/debug/*.apk
+          path: DirtRush/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
